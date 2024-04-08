@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace NuvTools.Validation.Brazil;
 
 /// <summary>
@@ -8,11 +6,11 @@ namespace NuvTools.Validation.Brazil;
 public static class Validator
 {
     /// <summary>
-    /// Método para validar um CPF ou um CNPJ. 
+    /// Validates a CPF or CNPJ. 
     /// </summary>
-    /// <param name="value">Informe um CPF ou um CNPJ. Retorno True: CPF ou CNPJ válido. False: CPF ou CNPJ inválido.</param>
-    /// <returns>True: CPF ou CNPJ válido. False: CPF ou CNPJ inválido.</returns>
-    public static bool IsCPForCNPJ(string value)
+    /// <param name="value">Enter a CPF or a CNPJ.</param>
+    /// <returns>True: CPF or CNPJ is valid. False: CPF or CNPJ is invalid.</returns>
+    public static bool IsCPForCNPJ(this string value)
     {
         string numbersOnly = value.GetNumbersOnly();
 
@@ -24,46 +22,51 @@ public static class Validator
     }
 
     /// <summary>
-    /// Método para validar um CPF. 
+    /// Validates a CPF.
     /// </summary>
-    /// <param name="value">Informe um CPF. Retorno True: CPF válido. False: CPF inválido.</param>
-    /// <returns>True: CPF válido. False: CPF inválido.</returns>
-    public static bool IsCPF(string value)
+    /// <param name="value">Enter a CPF.</param>
+    /// <returns>True: CPF or CNPJ is valid. False: CPF or CNPJ is invalid.</returns>
+    public static bool IsCPF(this string value)
     {
-        string numbersOnly = value.GetNumbersOnly();
+        value = value.GetNumbersOnly();
 
-        if (numbersOnly.Length != 11)
+        if (value.Length != 11)
             return false;
 
-        string number = numbersOnly.Substring(0, 9);
-        string verifiedNumber = numbersOnly.Substring(9, 2);
+        for (int j = 0; j < 10; j++)
+            if (j.ToString().PadLeft(11, char.Parse(j.ToString())) == value)
+                return false;
+
+        int[] multiplier1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplier2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        string tempValue = value[..9];
         int sum = 0;
 
         for (int i = 0; i < 9; i++)
-            sum += int.Parse(number.Substring(i, 1), NumberFormatInfo.InvariantInfo) * (10 - i);
+            sum += int.Parse(tempValue[i].ToString()) * multiplier1[i];
 
-        if (sum == 0)
-            return false;
+        int remainder = sum % 11;
+        if (remainder < 2)
+            remainder = 0;
+        else
+            remainder = 11 - remainder;
 
-        sum = 11 - sum % 11;
+        string digit = remainder.ToString();
+        tempValue += digit;
+        sum = 0;
+        for (int i = 0; i < 10; i++)
+            sum += int.Parse(tempValue[i].ToString()) * multiplier2[i];
 
-        if (sum > 9)
-            sum = 0;
+        remainder = sum % 11;
+        if (remainder < 2)
+            remainder = 0;
+        else
+            remainder = 11 - remainder;
 
-        if (int.Parse(verifiedNumber.Substring(0, 1), NumberFormatInfo.InvariantInfo) != sum)
-            return false;
+        digit += remainder.ToString();
 
-        sum *= 2;
-        for (int i = 0; i < 9; i++)
-            sum += int.Parse(number.Substring(i, 1), NumberFormatInfo.InvariantInfo) * (11 - i);
-
-        sum = 11 - sum % 11;
-        if (sum > 9)
-            sum = 0;
-        if (int.Parse(verifiedNumber.Substring(1, 1), NumberFormatInfo.InvariantInfo) != sum)
-            return false;
-
-        return true;
+        return value.EndsWith(digit);
     }
 
     /// <summary>
@@ -71,42 +74,38 @@ public static class Validator
     /// </summary>
     /// <param name="value">Informe um CNPJ. Retorno True: CNPJ válido. False: CNPJ inválido.</param>
     /// <returns>True: CNPJ válido. False: CNPJ inválido.</returns>
-    public static bool IsCNPJ(string value)
+    public static bool IsCNPJ(this string value)
     {
-        string numbersOnly = value.GetNumbersOnly();
+        value = value.GetNumbersOnly();
 
-        if (numbersOnly.Length != 14)
+        if (value.Length != 14)
             return false;
 
-        string number = numbersOnly.Substring(0, 12);
-        string verifiedNumber = numbersOnly.Substring(12, 2);
+        int[] multiplier1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplier2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        string tempValue = value[..12];
         int sum = 0;
 
         for (int i = 0; i < 12; i++)
-            sum += int.Parse(number.Substring(11 - i, 1), NumberFormatInfo.InvariantInfo) * (2 + i % 8);
+            sum += int.Parse(tempValue[i].ToString()) * multiplier1[i];
 
-        if (sum == 0)
-            return false;
+        int remainder = sum % 11;
+        remainder = remainder < 2 ? 0 : 11 - remainder;
 
-        sum = 11 - sum % 11;
-        if (sum > 9)
-            sum = 0;
+        string digit = remainder.ToString();
+        tempValue += digit;
 
-        if (int.Parse(verifiedNumber.Substring(0, 1), NumberFormatInfo.InvariantInfo) != sum)
-            return false;
+        sum = 0;
+        for (int i = 0; i < 13; i++)
+            sum += int.Parse(tempValue[i].ToString()) * multiplier2[i];
 
-        sum *= 2;
-        for (int i = 0; i < 12; i++)
-            sum += int.Parse(number.Substring(11 - i, 1), NumberFormatInfo.InvariantInfo) * (2 + (i + 1) % 8);
+        remainder = sum % 11;
+        remainder = remainder < 2 ? 0 : 11 - remainder;
 
-        sum = 11 - sum % 11;
-        if (sum > 9)
-            sum = 0;
+        digit += remainder.ToString();
 
-        if (int.Parse(verifiedNumber.Substring(1, 1), NumberFormatInfo.InvariantInfo) != sum)
-            return false;
-
-        return true;
+        return value.EndsWith(digit);
     }
 
 }

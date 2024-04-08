@@ -3,10 +3,10 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
-		<Version>8.0.0</Version>
+		<Version>8.0.1</Version>
 		<Authors>Nuv Tools</Authors>
 		<Copyright>Copyright © 2024 Nuv Tools</Copyright>
-		<PackageProjectUrl>https://nuv.tools</PackageProjectUrl>
+		<PackageProjectUrl>https://nuvtools.com</PackageProjectUrl>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>NuvTools.Validation.Tests.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
+	  <ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
 	</ItemGroup>
 
 </Project>
