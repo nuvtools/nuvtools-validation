@@ -1,15 +1,16 @@
 namespace NuvTools.Validation.Brazil;
 
+
 /// <summary>
-/// Validators's class.
+/// Responsible for validating rules used in Brazil.
 /// </summary>
 public static class Validator
 {
     /// <summary>
     /// Validates a CPF or CNPJ. 
     /// </summary>
-    /// <param name="value">Enter a CPF or a CNPJ.</param>
-    /// <returns>True: CPF or CNPJ is valid. False: CPF or CNPJ is invalid.</returns>
+    /// <param name="value">Enter a CPF or CNPJ.</param>
+    /// <returns>Whether CPF or CNPJ is valid or not.</returns>
     public static bool IsCPForCNPJ(this string value)
     {
         string numbersOnly = value.GetNumbersOnly();
@@ -25,7 +26,7 @@ public static class Validator
     /// Validates a CPF.
     /// </summary>
     /// <param name="value">Enter a CPF.</param>
-    /// <returns>True: CPF or CNPJ is valid. False: CPF or CNPJ is invalid.</returns>
+    /// <returns>Whether CPF is valid or not.</returns>
     public static bool IsCPF(this string value)
     {
         value = value.GetNumbersOnly();
@@ -70,10 +71,10 @@ public static class Validator
     }
 
     /// <summary>
-    /// Método para validar um CNPJ. 
+    /// Validates a CNPJ.
     /// </summary>
-    /// <param name="value">Informe um CNPJ. Retorno True: CNPJ válido. False: CNPJ inválido.</param>
-    /// <returns>True: CNPJ válido. False: CNPJ inválido.</returns>
+    /// <param name="value">Enter a CNPJ.</param>
+    /// <returns>Whether CNPJ is valid or not.</returns>
     public static bool IsCNPJ(this string value)
     {
         value = value.GetNumbersOnly();
