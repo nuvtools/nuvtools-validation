@@ -4,7 +4,7 @@ using NuvTools.Validation.Brazil;
 namespace NuvTools.Validation.Tests.Brazil;
 
 [TestFixture()]
-public class CNPJandCPFExtensions
+public class BrazilValidatorExtensions
 {
     [Test()]
     public void ValidateCNPJ()
@@ -22,6 +22,18 @@ public class CNPJandCPFExtensions
         Assert.That(!"erro".IsCPF());
         Assert.That("583.008.930-08".IsCPF());
         Assert.That("83289988074".IsCPF());
+    }
+
+    [Test()]
+    public void ValidateMobileNumber()
+    {
+        Assert.That("61944446666".IsMobileNumber());
+        Assert.That("21955557777".IsMobileNumber());
+        Assert.That("(21) 95555-7777".IsMobileNumber());
+        Assert.That(!"(21) 95555-7777".IsMobileNumber(false));
+        Assert.That(!"erro".IsMobileNumber());
+        Assert.That(!"994645".IsMobileNumber());
+        Assert.That(!"21866664444".IsMobileNumber());
     }
 
 }

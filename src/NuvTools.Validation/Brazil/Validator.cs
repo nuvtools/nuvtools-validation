@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace NuvTools.Validation.Brazil;
 
 
@@ -107,6 +109,22 @@ public static class Validator
         digit += remainder.ToString();
 
         return value.EndsWith(digit);
+    }
+
+    /// <summary>
+    /// Validates a mobile phone number based on a specific regex pattern. The method checks if the phone number contains a valid Brazilian Code Area, followed by the digit 9 and then exactly eight digits.
+    /// </summary>
+    /// <param name="mobileNumber">Mobile number.</param>
+    /// <param name="clearMask">Clear mask before validate.</param>
+    /// <returns></returns>
+    public static bool IsMobileNumber(this string mobileNumber, bool clearMask = true)
+    {
+        if (clearMask)
+            mobileNumber = mobileNumber.GetNumbersOnly();
+
+        var regex = new Regex(RegexPattern.MobileNumber);
+        var match = regex.Match(mobileNumber);
+        return match.Success;
     }
 
 }
