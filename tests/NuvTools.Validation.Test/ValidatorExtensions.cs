@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace NuvTools.Validation.Tests;
 
@@ -45,6 +46,35 @@ public class ValidatorExtensions
         Assert.That(!"-11111111111".IsDecimalNumber(true));
         Assert.That(!"erro".IsDecimalNumber());
         Assert.That("83289988074".IsDecimalNumber());
+    }
+
+
+    [Test()]
+    public void ValidateDataURIBase64()
+    {
+        string dataURIBase64 = "data:text/plain;base64,TnV2IFRvb2xz";
+
+        Regex regex = new(RegexPattern.BASE64_DATAURI);
+        var result = regex.Match(dataURIBase64);
+
+        Assert.That(result.Groups["type"].Value == "text/plain");
+        Assert.That(result.Groups["extension"].Value == "plain");
+        Assert.That(result.Groups["content"].Value == "TnV2IFRvb2xz");
+    }
+
+    [Test()]
+    public void ValidateBase64()
+    {
+        string base64Content = "TnV2IFRvb2xz";
+
+        Regex regex = new(RegexPattern.BASE64_CONTENT);
+        var result = regex.Match(base64Content);
+
+        Assert.That(result.Groups["content"].Value == "TnV2IFRvb2xz");
+
+        var restultB = regex.IsMatch(base64Content + "A");
+
+        Assert.That(!restultB);
     }
 
 }

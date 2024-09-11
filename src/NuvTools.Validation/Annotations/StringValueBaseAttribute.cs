@@ -3,12 +3,8 @@ using System.Globalization;
 
 namespace NuvTools.Validation.Annotations;
 
-public class StringValueBaseAttribute : ValidationAttribute
+public class StringValueBaseAttribute(Func<string> errorMessageAccessor) : ValidationAttribute(errorMessageAccessor)
 {
-    public StringValueBaseAttribute(Func<string> errorMessageAccessor)
-        : base(errorMessageAccessor)
-    {
-    }
 
     /// <summary>
     /// Applies formatting to a specified error message. (Overrides <see cref = "ValidationAttribute.FormatErrorMessage" />)
@@ -20,7 +16,7 @@ public class StringValueBaseAttribute : ValidationAttribute
         return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name);
     }
 
-    protected static bool IsValidValue(object value)
+    protected static bool IsValidValue(object? value)
     {
         return value != null
             && value is string

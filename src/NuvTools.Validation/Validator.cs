@@ -13,24 +13,22 @@ public static class Validator
     /// </summary>
     /// <param name="value">E-mail address</param>
     /// <returns></returns>
-    public static bool IsEmail(this string value) => Regex.IsMatch(value, RegexPattern.EmailAddress);
+    public static bool IsEmail(this string value) => Regex.IsMatch(value, RegexPattern.EMAIL_ADDRESS);
 
-    public static List<string> Validate<T>(this T obj)
+    public static List<string>? Validate<T>(this T obj)
     {
+        ArgumentNullException.ThrowIfNull(obj, nameof(obj));
         ValidationContext context = new(obj, serviceProvider: null, items: null);
-        List<ValidationResult> results = new();
+        List<ValidationResult> results = [];
         bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(obj, context, results, true);
 
-        if (isValid == false)
-        {
-            List<string> errors = new();
-            foreach (var validationResult in results)
-                errors.Add(validationResult.ErrorMessage);
+        if (isValid) return null;
 
-            return errors;
-        }
+        List<string> errors = [];
+        foreach (var validationResult in results)
+            errors.Add(validationResult.ErrorMessage!);
 
-        return null;
+        return errors;
     }
 
     /// <summary>
@@ -57,7 +55,7 @@ public static class Validator
     {
         // Try to parse the input string as int
         if (int.TryParse(input, out int number))
-            return positiveOnly ? int.IsPositive(number) : true;
+            return !positiveOnly || int.IsPositive(number);
 
         // Return false if parsing fails or number is negative
         return false;
@@ -73,7 +71,7 @@ public static class Validator
     {
         // Try to parse the input string as long
         if (long.TryParse(input, out long number))
-            return positiveOnly ? long.IsPositive(number) : true;
+            return !positiveOnly || long.IsPositive(number);
 
         // Return false if parsing fails or number is negative
         return false;
@@ -86,11 +84,11 @@ public static class Validator
     /// <param name="positiveOnly">If only positive numbers is valid.</param>
     /// <param name="provider">An object that supplies culture-specific parsing information about s.</param>
     /// <returns>True if the input is a valid decimal number, otherwise false.</returns>
-    public static bool IsDecimalNumber(this string input, bool positiveOnly = false, IFormatProvider provider = null)
+    public static bool IsDecimalNumber(this string input, bool positiveOnly = false, IFormatProvider? provider = null)
     {
         // Try to parse the input string as a decimal
         if (decimal.TryParse(input, System.Globalization.NumberStyles.Number | System.Globalization.NumberStyles.AllowDecimalPoint, provider, out decimal number))
-            return positiveOnly ? decimal.IsPositive(number) : true;
+            return !positiveOnly || decimal.IsPositive(number);
 
         return false;
     }

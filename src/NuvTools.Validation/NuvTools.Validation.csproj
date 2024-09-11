@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net7;net8</TargetFrameworks>
+		<TargetFrameworks>net8</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Nuv Tools</Authors>
@@ -10,7 +10,7 @@
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>NuvTools.Validation.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
-		<Version>8.1.0</Version>
+		<Version>8.1.1</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<PackageIcon>icon.png</PackageIcon>
@@ -23,6 +23,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>NuvTools Validators CPF CNPJ</PackageTags>
 		<ImplicitUsings>true</ImplicitUsings>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

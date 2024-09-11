@@ -3,21 +3,16 @@ using System.Text.RegularExpressions;
 
 namespace NuvTools.Validation.Annotations;
 
-public class PasswordComplexityCapitalLettersAttribute : PasswordComplexityBaseAttribute
+public class PasswordComplexityCapitalLettersAttribute(int minOccurrences) : PasswordComplexityBaseAttribute(minOccurrences, () => Messages.XMustContainAtLeastYCapitalLetters)
 {
-    public PasswordComplexityCapitalLettersAttribute(int minOccurrences)
-        : base(minOccurrences, () => Messages.XMustContainAtLeastYCapitalLetters)
-    {
-    }
-
-    public override bool IsValid(object value)
+    public override bool IsValid(object? value)
     {
         EnsureLegalMinOcorrences();
 
         // Automatically pass if value is null. RequiredAttribute should be used to assert a value is not null.
         if (!IsValidValue(value)) return true;
 
-        string str = value as string;
+        string str = (string)value!;
 
         return Regex.Matches(str, @"[A-Z]").Count >= MinOccurrences;
     }

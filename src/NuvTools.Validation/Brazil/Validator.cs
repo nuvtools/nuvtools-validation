@@ -127,4 +127,19 @@ public static class Validator
         return match.Success;
     }
 
+    /// <summary>
+    /// Validates Zip Code number
+    /// </summary>
+    /// <param name="zipCode">Zip Code.</param>
+    /// <param name="clearMask">Clear mask before validate.</param>
+    /// <returns></returns>
+    public static bool IsZipCodeNumber(this string zipCode, bool clearMask = true)
+    {
+        zipCode = zipCode.GetNumbersOnly();
+
+        if (zipCode.Length != 8) return false;
+
+        return true;
+    }
+
 }

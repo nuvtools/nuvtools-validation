@@ -4,15 +4,9 @@ using System.Globalization;
 
 namespace NuvTools.Validation.Annotations;
 
-public abstract class PasswordComplexityBaseAttribute : ValidationAttribute
+public abstract class PasswordComplexityBaseAttribute(int minOccurrences, Func<string> errorMessageAccessor) : ValidationAttribute(errorMessageAccessor)
 {
-    public int MinOccurrences { get; private set; }
-
-    public PasswordComplexityBaseAttribute(int minOccurrences, Func<string> errorMessageAccessor)
-        : base(errorMessageAccessor)
-    {
-        MinOccurrences = minOccurrences;
-    }
+    public int MinOccurrences { get; private set; } = minOccurrences;
 
     /// <summary>
     /// Applies formatting to a specified error message. (Overrides <see cref = "ValidationAttribute.FormatErrorMessage" />)
@@ -36,7 +30,7 @@ public abstract class PasswordComplexityBaseAttribute : ValidationAttribute
         }
     }
 
-    protected static bool IsValidValue(object value)
+    protected static bool IsValidValue(object? value)
     {
         return value != null
             && value is string

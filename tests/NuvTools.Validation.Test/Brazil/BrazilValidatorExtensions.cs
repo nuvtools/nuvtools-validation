@@ -36,4 +36,14 @@ public class BrazilValidatorExtensions
         Assert.That(!"21866664444".IsMobileNumber());
     }
 
+    [Test()]
+    public void ValidateZipCode()
+    {
+        Assert.That("71065-100".IsZipCodeNumber());
+        Assert.That("88999232".IsZipCodeNumber());
+        Assert.That(!"(21) 95555-7777".IsZipCodeNumber());
+        Assert.That(!"95.555-777".IsZipCodeNumber());
+        Assert.That(!"error".IsZipCodeNumber());
+    }
+
 }
