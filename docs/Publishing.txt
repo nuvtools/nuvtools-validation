@@ -1,1 +1,1 @@
-nuget.exe push -Source "nuvtools" -ApiKey az NuvTools.Validation.8.1.1.nupkg
+nuget.exe push -Source "nuvtools" -ApiKey az NuvTools.Validation.9.0.0.nupkg
