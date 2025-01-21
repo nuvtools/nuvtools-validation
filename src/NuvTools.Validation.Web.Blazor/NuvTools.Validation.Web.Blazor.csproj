@@ -1,14 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
+  <PropertyGroup>
 		<TargetFrameworks>net8;net9</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
 		<LangVersion>latest</LangVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Nuv Tools</Authors>
 		<Copyright>Copyright © 2025 Nuv Tools</Copyright>
 		<PackageProjectUrl>https://nuvtools.com</PackageProjectUrl>
 		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>NuvTools.Validation.snk</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>NuvTools.Validation.Web.Blazor.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
 		<Version>9.0.0</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -22,9 +25,7 @@
 		<AnalysisLevel>latest</AnalysisLevel>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>NuvTools Validators CPF CNPJ</PackageTags>
-		<ImplicitUsings>true</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<None Include="..\..\icon.png">
@@ -43,19 +44,10 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Resources\Messages.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Messages.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net9'" Version="9.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net8'" Version="8.0.12" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Update="Resources\Messages.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
-	
 </Project>
