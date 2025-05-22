@@ -13,7 +13,7 @@
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>NuvTools.Validation.AspNetCore.Blazor.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
-		<Version>9.1.0</Version>
+		<Version>9.1.2</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<PackageIcon>icon.png</PackageIcon>
@@ -45,9 +45,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net9'" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net8'" Version="8.0.14" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net9'" Version="9.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net8'" Version="8.0.16" />
 	</ItemGroup>
 
 </Project>
