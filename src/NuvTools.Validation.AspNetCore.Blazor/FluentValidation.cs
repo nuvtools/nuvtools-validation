@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace NuvTools.Validation.Web.Blazor;
+namespace NuvTools.Validation.AspNetCore.Blazor;
 
 public class FluentValidation<TModel> where TModel : class, new()
 {
