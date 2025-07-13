@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace NuvTools.Validation.AspNetCore.Blazor;
@@ -6,82 +7,98 @@ namespace NuvTools.Validation.AspNetCore.Blazor;
 public class FluentValidation<TModel> where TModel : class, new()
 {
     private readonly IValidator<TModel> _validator;
+
     private readonly TModel _model;
+
     private readonly EditContext _editContext;
+
     private readonly ValidationMessageStore _validationMessageStore;
 
-    public FluentValidation(TModel model,
-            IValidator<TModel> validator,
-            EditContext editContext,
-            bool autoValidationOnRequested = true,
-            bool autoValidationOnFieldChanged = true)
+    public FluentValidation(TModel model, IValidator<TModel> validator, EditContext editContext, bool autoValidationOnRequested = true, bool autoValidationOnFieldChanged = true, bool highlightInvalidFields = true)
     {
         _model = model;
         _validator = validator;
         _editContext = editContext;
-
         _validationMessageStore = new ValidationMessageStore(_editContext);
-
         if (autoValidationOnRequested)
-            _editContext.OnValidationRequested += (sender, args) => ValidateModelAndHighlightInvalidFields();
-
-        if (autoValidationOnFieldChanged)
-            _editContext.OnFieldChanged += (sender, args) => ValidateField(args.FieldIdentifier);
-    }
-
-    /// <summary>
-    /// Perform validation for the entire model and populate the ValidationMessageStore.
-    /// </summary>
-    /// <returns>The validation result.</returns>
-    public FluentValidation.Results.ValidationResult Validate()
-    {
-        var validationResult = _validator.Validate(_model);
-
-        _validationMessageStore.Clear();
-
-        foreach (var error in validationResult.Errors)
         {
-            var fieldIdentifier = new FieldIdentifier(_model, error.PropertyName);
-            _validationMessageStore.Add(fieldIdentifier, error.ErrorMessage);
+            _editContext.OnValidationRequested += delegate
+            {
+                Validate();
+            };
         }
 
-        return validationResult;
+        if (autoValidationOnFieldChanged)
+        {
+            _editContext.OnFieldChanged += delegate (object? sender, FieldChangedEventArgs args)
+            {
+                ValidateField(args.FieldIdentifier);
+            };
+        }
+
+        if (highlightInvalidFields)
+            _editContext.NotifyValidationStateChanged();
     }
 
-    /// <summary>
-    /// Validate the entire model and highlight invalid fields in the UI.
-    /// </summary>
-    /// <returns>The validation result.</returns>
-    public FluentValidation.Results.ValidationResult ValidateModelAndHighlightInvalidFields()
+    //
+    // Summary:
+    //     Perform validation for the entire model and populate the ValidationMessageStore.
+    //
+    //
+    // Returns:
+    //     The validation result.
+    public ValidationResult Validate(bool highlightInvalidFields = true)
     {
-        var validationResult = Validate();
+        ValidationResult validationResult = _validator.Validate(_model);
+        _validationMessageStore.Clear();
+        foreach (ValidationFailure error in validationResult.Errors)
+        {
+            FieldIdentifier fieldIdentifier = ToFieldIdentifier(_editContext, error.PropertyName);
+            _validationMessageStore.Add(in fieldIdentifier, error.ErrorMessage);
+        }
 
-        _editContext.NotifyValidationStateChanged();
+        if (highlightInvalidFields)
+            _editContext.NotifyValidationStateChanged();
 
         return validationResult;
     }
+    private static FieldIdentifier ToFieldIdentifier(EditContext editContext, string propertyPath)
+    {
+        var model = editContext.Model;
+        var parts = propertyPath.Split('.');
+        if (parts.Length == 1)
+            return new FieldIdentifier(model, propertyPath);
 
-    /// <summary>
-    /// Validate a specific field and update its validation state.
-    /// </summary>
-    /// <param name="fieldIdentifier">The field to validate.</param>
+        object? currentObject = model;
+        for (int i = 0; i < parts.Length - 1; i++)
+        {
+            var property = currentObject?.GetType().GetProperty(parts[i]);
+            currentObject = property?.GetValue(currentObject);
+            if (currentObject == null)
+                break;
+        }
+
+        return new FieldIdentifier(currentObject!, parts.Last());
+    }
+
+    //
+    // Summary:
+    //     Validate a specific field and update its validation state.
+    //
+    // Parameters:
+    //   fieldIdentifier:
+    //     The field to validate.
     public void ValidateField(FieldIdentifier fieldIdentifier)
     {
-        var propertyName = fieldIdentifier.FieldName;
-
-        // Create a ValidationContext for the specific field
-        var validationContext = new ValidationContext<TModel>(_model)
+        string propertyName = fieldIdentifier.FieldName;
+        ValidationContext<TModel> validationContext = new ValidationContext<TModel>(_model);
+        validationContext.RootContextData["__FV_PropertyName__"] = propertyName;
+        ValidationContext<TModel> context = validationContext;
+        ValidationResult validationResult = _validator.Validate(context);
+        _validationMessageStore.Clear(in fieldIdentifier);
+        foreach (ValidationFailure item in validationResult.Errors.Where((ValidationFailure e) => e.PropertyName == propertyName))
         {
-            RootContextData = { ["__FV_PropertyName__"] = propertyName }
-        };
-
-        var validationResult = _validator.Validate(validationContext);
-
-        _validationMessageStore.Clear(fieldIdentifier);
-
-        foreach (var error in validationResult.Errors.Where(e => e.PropertyName == propertyName))
-        {
-            _validationMessageStore.Add(fieldIdentifier, error.ErrorMessage);
+            _validationMessageStore.Add(in fieldIdentifier, item.ErrorMessage);
         }
     }
 }

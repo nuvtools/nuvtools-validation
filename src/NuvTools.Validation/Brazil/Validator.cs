@@ -133,13 +133,13 @@ public static class Validator
     /// <param name="zipCode">Zip Code.</param>
     /// <param name="clearMask">Clear mask before validate.</param>
     /// <returns></returns>
-    public static bool IsZipCodeNumber(this string zipCode, bool clearMask = true)
+    public static bool IsZipCodeNumber(this string zipCode)
     {
-        zipCode = zipCode.GetNumbersOnly();
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
+        var match = Regex.IsMatch(zipCode, @"^\d{5}-?\d{3}$");
+#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
-        if (zipCode.Length != 8) return false;
-
-        return true;
+        return match;
     }
 
 }

@@ -9,12 +9,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentValidation" Version="12.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="9.0.7" />
 		<PackageReference Include="NUnit" Version="4.3.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\NuvTools.Validation.AspNetCore.Blazor\NuvTools.Validation.AspNetCore.Blazor.csproj" />
 	  <ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
 	</ItemGroup>
 
