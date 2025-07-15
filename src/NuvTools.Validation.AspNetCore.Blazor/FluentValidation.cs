@@ -88,7 +88,7 @@ public class FluentValidation<TModel> where TModel : class, new()
     // Parameters:
     //   fieldIdentifier:
     //     The field to validate.
-    public void ValidateField(FieldIdentifier fieldIdentifier)
+    public void ValidateField(FieldIdentifier fieldIdentifier, bool highlightInvalidField = true)
     {
         string propertyName = fieldIdentifier.FieldName;
         ValidationContext<TModel> validationContext = new ValidationContext<TModel>(_model);
@@ -100,5 +100,8 @@ public class FluentValidation<TModel> where TModel : class, new()
         {
             _validationMessageStore.Add(in fieldIdentifier, item.ErrorMessage);
         }
+
+        if (highlightInvalidField)
+            _editContext.NotifyValidationStateChanged();
     }
 }
