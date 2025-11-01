@@ -13,7 +13,7 @@
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>NuvTools.Validation.AspNetCore.Blazor.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
-		<Version>9.5.0</Version>
+		<Version>9.5.1</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<PackageIcon>icon.png</PackageIcon>

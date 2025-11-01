@@ -1,35 +1,16 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-
 namespace NuvTools.Validation;
 
 /// <summary>
 /// Validators's class.
 /// </summary>
-public static class Validator
+public static partial class Validator
 {
     /// <summary>
     /// Validate the e-mail address.
     /// </summary>
     /// <param name="value">E-mail address</param>
     /// <returns></returns>
-    public static bool IsEmail(this string value) => Regex.IsMatch(value, RegexPattern.EMAIL_ADDRESS);
-
-    public static List<string>? Validate<T>(this T obj)
-    {
-        ArgumentNullException.ThrowIfNull(obj, nameof(obj));
-        ValidationContext context = new(obj, serviceProvider: null, items: null);
-        List<ValidationResult> results = [];
-        bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(obj, context, results, true);
-
-        if (isValid) return null;
-
-        List<string> errors = [];
-        foreach (var validationResult in results)
-            errors.Add(validationResult.ErrorMessage!);
-
-        return errors;
-    }
+    public static bool IsEmail(this string value) => RegexPattern.EmailRegex().IsMatch(value);
 
     /// <summary>
     /// Checks if the provided string contains only numeric characters.

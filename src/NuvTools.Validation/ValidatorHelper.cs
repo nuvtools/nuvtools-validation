@@ -5,11 +5,14 @@ namespace NuvTools.Validation;
 /// <summary>
 /// Helpers to works with validation functions.
 /// </summary>
-internal static class ValidatorHelper
+internal static partial class ValidatorHelper
 {
 
     public static string GetNumbersOnly(this string value)
     {
-        return new Regex(@"\D", RegexOptions.IgnoreCase).Replace(value, string.Empty);
+        return GetNumbersOnlyRegex().Replace(value, string.Empty);
     }
+
+    [GeneratedRegex(@"\D", RegexOptions.IgnoreCase)]
+    private static partial Regex GetNumbersOnlyRegex();
 }

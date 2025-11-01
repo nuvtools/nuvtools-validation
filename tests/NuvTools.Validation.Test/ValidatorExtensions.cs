@@ -54,8 +54,7 @@ public class ValidatorExtensions
     {
         string dataURIBase64 = "data:text/plain;base64,TnV2IFRvb2xz";
 
-        Regex regex = new(RegexPattern.BASE64_DATAURI);
-        var result = regex.Match(dataURIBase64);
+        var result = RegexPattern.Base64DataUriRegex().Match(dataURIBase64);
 
         Assert.That(result.Groups["type"].Value == "text/plain");
         Assert.That(result.Groups["extension"].Value == "plain");
@@ -67,7 +66,7 @@ public class ValidatorExtensions
     {
         string base64Content = "TnV2IFRvb2xz";
 
-        Regex regex = new(RegexPattern.BASE64_CONTENT);
+        Regex regex = RegexPattern.Base64ContentRegex();
         var result = regex.Match(base64Content);
 
         Assert.That(result.Groups["content"].Value == "TnV2IFRvb2xz");

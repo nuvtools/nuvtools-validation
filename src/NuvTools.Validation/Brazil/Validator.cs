@@ -84,14 +84,17 @@ public static class Validator
         if (value.Length != 14)
             return false;
 
-        int[] multiplier1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        int[] multiplier2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        if (value.Distinct().Count() == 1)
+            return false;
+
+        int[] multiplier1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplier2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
         string tempValue = value[..12];
         int sum = 0;
 
         for (int i = 0; i < 12; i++)
-            sum += int.Parse(tempValue[i].ToString()) * multiplier1[i];
+            sum += (tempValue[i] - '0') * multiplier1[i];
 
         int remainder = sum % 11;
         remainder = remainder < 2 ? 0 : 11 - remainder;
@@ -101,7 +104,7 @@ public static class Validator
 
         sum = 0;
         for (int i = 0; i < 13; i++)
-            sum += int.Parse(tempValue[i].ToString()) * multiplier2[i];
+            sum += (tempValue[i] - '0') * multiplier2[i];
 
         remainder = sum % 11;
         remainder = remainder < 2 ? 0 : 11 - remainder;
@@ -115,14 +118,11 @@ public static class Validator
     /// Validates a mobile phone number based on a specific regex pattern. The method checks if the phone number contains a valid Brazilian Code Area, followed by the digit 9 and then exactly eight digits.
     /// </summary>
     /// <param name="mobileNumber">Mobile number.</param>
-    /// <param name="clearMask">Clear mask before validate.</param>
     /// <returns></returns>
-    public static bool IsMobileNumber(this string mobileNumber, bool clearMask = true)
+    public static bool IsMobileNumber(this string mobileNumber)
     {
-        if (clearMask)
-            mobileNumber = mobileNumber.GetNumbersOnly();
-
-        var regex = new Regex(RegexPattern.MobileNumber);
+        mobileNumber = mobileNumber.GetNumbersOnly();
+        var regex = RegexPattern.MobileNumberRegex();
         var match = regex.Match(mobileNumber);
         return match.Success;
     }
@@ -134,11 +134,6 @@ public static class Validator
     /// <returns></returns>
     public static bool IsZipCodeNumber(this string zipCode)
     {
-#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
-        var match = Regex.IsMatch(zipCode, @"^\d{5}-?\d{3}$");
-#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
-
-        return match;
+        return RegexPattern.ZipCodeRegex().IsMatch(zipCode);
     }
-
 }
