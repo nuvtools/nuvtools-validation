@@ -15,6 +15,10 @@ public static partial class RegexPattern
     [GeneratedRegex(MobileNumber)]
     public static partial Regex MobileNumberRegex();
 
+    /// <summary>
+    /// Regex pattern for Brazilian ZIP code (CEP) validation.
+    /// Validates format: XXXXX-XXX or XXXXXXXX (with or without hyphen).
+    /// </summary>
     [GeneratedRegex(@"^\d{5}-?\d{3}$")]
     public static partial Regex ZipCodeRegex();
 }

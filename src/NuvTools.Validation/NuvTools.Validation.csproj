@@ -1,16 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8;net9</TargetFrameworks>
+		<TargetFrameworks>net8;net9;net10.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Nuv Tools</Authors>
 		<Copyright>Copyright © 2025 Nuv Tools</Copyright>
 		<PackageProjectUrl>https://nuvtools.com</PackageProjectUrl>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>NuvTools.Validation.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
-		<Version>9.5.1</Version>
+		<Version>10.0.0</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<PackageIcon>icon.png</PackageIcon>

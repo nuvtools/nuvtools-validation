@@ -4,8 +4,17 @@ using System.Globalization;
 
 namespace NuvTools.Validation.Annotations;
 
+/// <summary>
+/// Abstract base class for password complexity validation attributes.
+/// Provides common functionality for validating minimum occurrences of specific character types in passwords.
+/// </summary>
+/// <param name="minOccurrences">The minimum number of occurrences required for the specific character type.</param>
+/// <param name="errorMessageAccessor">A function that returns the error message to use when validation fails.</param>
 public abstract class PasswordComplexityBaseAttribute(int minOccurrences, Func<string> errorMessageAccessor) : ValidationAttribute(errorMessageAccessor)
 {
+    /// <summary>
+    /// Gets the minimum number of occurrences required for the specific character type.
+    /// </summary>
     public int MinOccurrences { get; private set; } = minOccurrences;
 
     /// <summary>
@@ -30,6 +39,11 @@ public abstract class PasswordComplexityBaseAttribute(int minOccurrences, Func<s
         }
     }
 
+    /// <summary>
+    /// Determines whether the provided value is a valid non-empty string for password validation.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value is a non-null, non-empty string; otherwise, false.</returns>
     protected static bool IsValidValue(object? value)
     {
         return value != null

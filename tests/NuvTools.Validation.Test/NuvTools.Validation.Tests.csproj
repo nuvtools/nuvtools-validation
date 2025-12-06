@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<Authors>Nuv Tools</Authors>
 		<Copyright>Copyright © 2025 Nuv Tools</Copyright>
@@ -9,10 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentValidation" Version="12.0.0" />
+		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="NUnit" Version="4.4.0" />
 		<PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

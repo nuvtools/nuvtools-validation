@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8;net9</TargetFrameworks>
+		<TargetFrameworks>net8;net9;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -10,10 +10,8 @@
 		<Authors>Nuv Tools</Authors>
 		<Copyright>Copyright © 2025 Nuv Tools</Copyright>
 		<PackageProjectUrl>https://nuvtools.com</PackageProjectUrl>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>NuvTools.Validation.AspNetCore.Blazor.snk</AssemblyOriginatorKeyFile>
 		<Description>Validation library for Web, Desktop and Mobile (MAUI) applications.</Description>
-		<Version>9.5.1</Version>
+		<Version>10.0.0</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<PackageIcon>icon.png</PackageIcon>
@@ -45,9 +43,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net9'" Version="9.0.10" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net8'" Version="8.0.21" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net9'" Version="9.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Condition="'$(TargetFramework)' == 'net8'" Version="8.0.22" />
 	</ItemGroup>
 
 </Project>

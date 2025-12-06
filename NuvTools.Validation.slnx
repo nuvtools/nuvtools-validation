@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\NuvTools.Validation\NuvTools.Validation.csproj" />
+    <Project Path="src\NuvTools.Validation.AspNetCore.Blazor\NuvTools.Validation.AspNetCore.Blazor.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\NuvTools.Validation.Test\NuvTools.Validation.Tests.csproj" />
+  </Folder>
+</Solution>

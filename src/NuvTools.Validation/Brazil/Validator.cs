@@ -4,15 +4,22 @@ namespace NuvTools.Validation.Brazil;
 
 
 /// <summary>
-/// Responsible for validating rules used in Brazil.
+/// Provides validation methods for Brazilian document numbers and identification formats.
 /// </summary>
 public static class Validator
 {
     /// <summary>
-    /// Validates a CPF or CNPJ. 
+    /// Validates a CPF or CNPJ by automatically detecting the document type based on length.
+    /// Accepts both formatted and unformatted input.
     /// </summary>
-    /// <param name="value">Enter a CPF or CNPJ.</param>
-    /// <returns>Whether CPF or CNPJ is valid or not.</returns>
+    /// <param name="value">The CPF or CNPJ value to validate (11 digits for CPF, 14 digits for CNPJ).</param>
+    /// <returns>True if the value is a valid CPF or CNPJ; otherwise, false.</returns>
+    /// <example>
+    /// <code>
+    /// bool isValid1 = "123.456.789-01".IsCPForCNPJ(); // Validates as CPF
+    /// bool isValid2 = "12.345.678/0001-95".IsCPForCNPJ(); // Validates as CNPJ
+    /// </code>
+    /// </example>
     public static bool IsCPForCNPJ(this string value)
     {
         string numbersOnly = value.GetNumbersOnly();
@@ -25,10 +32,17 @@ public static class Validator
     }
 
     /// <summary>
-    /// Validates a CPF.
+    /// Validates a Brazilian CPF (Cadastro de Pessoas Físicas) number using the official checksum algorithm.
+    /// Accepts both formatted (XXX.XXX.XXX-XX) and unformatted (XXXXXXXXXXX) input.
     /// </summary>
-    /// <param name="value">Enter a CPF.</param>
-    /// <returns>Whether CPF is valid or not.</returns>
+    /// <param name="value">The CPF value to validate.</param>
+    /// <returns>True if the CPF is valid according to the checksum algorithm; otherwise, false.</returns>
+    /// <example>
+    /// <code>
+    /// bool isValid = "123.456.789-01".IsCPF();
+    /// bool isValidUnformatted = "12345678901".IsCPF();
+    /// </code>
+    /// </example>
     public static bool IsCPF(this string value)
     {
         value = value.GetNumbersOnly();
@@ -73,10 +87,17 @@ public static class Validator
     }
 
     /// <summary>
-    /// Validates a CNPJ.
+    /// Validates a Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) number using the official checksum algorithm.
+    /// Accepts both formatted (XX.XXX.XXX/XXXX-XX) and unformatted (XXXXXXXXXXXXXX) input.
     /// </summary>
-    /// <param name="value">Enter a CNPJ.</param>
-    /// <returns>Whether CNPJ is valid or not.</returns>
+    /// <param name="value">The CNPJ value to validate.</param>
+    /// <returns>True if the CNPJ is valid according to the checksum algorithm; otherwise, false.</returns>
+    /// <example>
+    /// <code>
+    /// bool isValid = "12.345.678/0001-95".IsCNPJ();
+    /// bool isValidUnformatted = "12345678000195".IsCNPJ();
+    /// </code>
+    /// </example>
     public static bool IsCNPJ(this string value)
     {
         value = value.GetNumbersOnly();
@@ -115,10 +136,18 @@ public static class Validator
     }
 
     /// <summary>
-    /// Validates a mobile phone number based on a specific regex pattern. The method checks if the phone number contains a valid Brazilian Code Area, followed by the digit 9 and then exactly eight digits.
+    /// Validates a Brazilian mobile phone number.
+    /// The method checks if the phone number contains a valid Brazilian area code (DDD),
+    /// followed by the digit 9 and then exactly eight digits (format: XX 9 XXXX-XXXX).
     /// </summary>
-    /// <param name="mobileNumber">Mobile number.</param>
-    /// <returns></returns>
+    /// <param name="mobileNumber">The mobile number to validate (accepts formatted or unformatted input).</param>
+    /// <returns>True if the mobile number is valid; otherwise, false.</returns>
+    /// <example>
+    /// <code>
+    /// bool isValid = "11987654321".IsMobileNumber(); // São Paulo mobile
+    /// bool isValid2 = "(21) 98765-4321".IsMobileNumber(); // Rio de Janeiro mobile
+    /// </code>
+    /// </example>
     public static bool IsMobileNumber(this string mobileNumber)
     {
         mobileNumber = mobileNumber.GetNumbersOnly();
@@ -128,10 +157,17 @@ public static class Validator
     }
 
     /// <summary>
-    /// Validates Zip Code number
+    /// Validates a Brazilian ZIP code (CEP - Código de Endereçamento Postal).
+    /// Accepts formats: XXXXX-XXX or XXXXXXXX (with or without hyphen).
     /// </summary>
-    /// <param name="zipCode">Zip Code.</param>
-    /// <returns></returns>
+    /// <param name="zipCode">The ZIP code to validate.</param>
+    /// <returns>True if the ZIP code format is valid; otherwise, false.</returns>
+    /// <example>
+    /// <code>
+    /// bool isValid = "01310-100".IsZipCodeNumber(); // With hyphen
+    /// bool isValid2 = "01310100".IsZipCodeNumber(); // Without hyphen
+    /// </code>
+    /// </example>
     public static bool IsZipCodeNumber(this string zipCode)
     {
         return RegexPattern.ZipCodeRegex().IsMatch(zipCode);

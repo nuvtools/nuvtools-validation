@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace NuvTools.Validation.AspNetCore.Blazor;
 
+/// <summary>
+/// Integrates FluentValidation with Blazor's EditContext and ValidationMessageStore.
+/// Provides automatic validation on form submission and field changes, with support for nested property paths.
+/// </summary>
+/// <typeparam name="TModel">The type of the model being validated.</typeparam>
 public class FluentValidation<TModel> where TModel : class, new()
 {
     private readonly IValidator<TModel> _validator;
@@ -14,6 +19,15 @@ public class FluentValidation<TModel> where TModel : class, new()
 
     private readonly ValidationMessageStore _validationMessageStore;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FluentValidation{TModel}"/> class.
+    /// </summary>
+    /// <param name="model">The model instance to validate.</param>
+    /// <param name="validator">The FluentValidation validator for the model.</param>
+    /// <param name="editContext">The Blazor EditContext to integrate with.</param>
+    /// <param name="autoValidationOnRequested">If true, automatically validates the entire model when EditContext.Validate() is called. Default is true.</param>
+    /// <param name="autoValidationOnFieldChanged">If true, automatically validates individual fields as they change. Default is true.</param>
+    /// <param name="highlightInvalidFields">If true, notifies the EditContext of validation state changes to highlight invalid fields. Default is true.</param>
     public FluentValidation(TModel model, IValidator<TModel> validator, EditContext editContext, bool autoValidationOnRequested = true, bool autoValidationOnFieldChanged = true, bool highlightInvalidFields = true)
     {
         _model = model;
@@ -62,6 +76,13 @@ public class FluentValidation<TModel> where TModel : class, new()
 
         return validationResult;
     }
+    /// <summary>
+    /// Converts a property path string (e.g., "Address.City") into a FieldIdentifier by traversing the object graph.
+    /// This enables validation errors on nested properties to bind correctly in Blazor forms.
+    /// </summary>
+    /// <param name="editContext">The EditContext containing the root model.</param>
+    /// <param name="propertyPath">The dot-separated property path (e.g., "Address.City").</param>
+    /// <returns>A FieldIdentifier representing the target property.</returns>
     private static FieldIdentifier ToFieldIdentifier(EditContext editContext, string propertyPath)
     {
         var model = editContext.Model;
@@ -81,13 +102,11 @@ public class FluentValidation<TModel> where TModel : class, new()
         return new FieldIdentifier(currentObject!, parts.Last());
     }
 
-    //
-    // Summary:
-    //     Validate a specific field and update its validation state.
-    //
-    // Parameters:
-    //   fieldIdentifier:
-    //     The field to validate.
+    /// <summary>
+    /// Validates a specific field and updates its validation state in the EditContext.
+    /// </summary>
+    /// <param name="fieldIdentifier">The field to validate.</param>
+    /// <param name="highlightInvalidField">If true, notifies the EditContext to highlight the field if invalid. Default is true.</param>
     public void ValidateField(FieldIdentifier fieldIdentifier, bool highlightInvalidField = true)
     {
         string propertyName = fieldIdentifier.FieldName;
