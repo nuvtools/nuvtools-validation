@@ -18,7 +18,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\NuvTools.Validation.AspNetCore.Blazor\NuvTools.Validation.AspNetCore.Blazor.csproj" />
 		<ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
 	</ItemGroup>
 
