@@ -4,13 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NuvTools.Validation is a multi-targeted .NET validation library designed for Web, Desktop, and Mobile (MAUI) applications. The solution consists of two libraries:
+NuvTools.Validation is a multi-targeted .NET validation library designed for Web, Desktop, and Mobile (MAUI) applications. It provides email and numeric validators, specialized Brazilian document validators (CPF, CNPJ, phone, CEP), password complexity attributes, and data annotations.
 
-- **NuvTools.Validation** - Core validation library with email, numeric, Brazilian document validators (CPF, CNPJ, phone, CEP), password complexity attributes, and data annotations
-- **NuvTools.Validation.AspNetCore.Blazor** - Blazor integration for FluentValidation with EditContext and ValidationMessageStore support
-- **NuvTools.Validation.Tests** - Test project using NUnit
+- **src/NuvTools.Validation** - Core validation library
+- **tests/NuvTools.Validation.Test** - NUnit test project
 
-All libraries are published as NuGet packages and target .NET 8, .NET 9, and .NET 10.
+The library is published as a NuGet package and targets .NET 8, .NET 9, and .NET 10.
 
 ## Build and Test Commands
 
@@ -43,11 +42,9 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 ## Architecture and Key Components
 
-### NuvTools.Validation Library
+The library is organized into three functional areas.
 
-Core validation library organized into three functional areas.
-
-#### General Validators (`NuvTools.Validation`)
+### General Validators (`NuvTools.Validation`)
 
 **Validator** - Extension methods for common validations:
 - `IsEmail()` - Email validation using source-generated regex
@@ -62,7 +59,7 @@ Core validation library organized into three functional areas.
 
 **ValidatorHelper** - Internal helper (`GetNumbersOnly()` for stripping non-digit characters)
 
-#### Brazilian Validators (`NuvTools.Validation.Brazil`)
+### Brazilian Validators (`NuvTools.Validation.Brazil`)
 
 **Validator** - Extension methods for Brazilian document validation:
 - `IsCPF()` - CPF validation with checksum algorithm (formatted or unformatted)
@@ -79,7 +76,7 @@ Core validation library organized into three functional areas.
 - `MobileNumberRegex()` - Mobile numbers with valid area codes (11-99)
 - `ZipCodeRegex()` - CEP format validation
 
-#### Data Annotations (`NuvTools.Validation.Annotations`)
+### Data Annotations (`NuvTools.Validation.Annotations`)
 
 **PasswordComplexityBaseAttribute** - Abstract base for password complexity:
 - `PasswordComplexityCapitalLettersAttribute(int minOccurrences)` - Minimum uppercase letters
@@ -91,22 +88,10 @@ Core validation library organized into three functional areas.
 **Validator** (Annotations) - Extension method:
 - `Validate<T>()` - Validates object using DataAnnotation attributes, returns error list or null
 
-#### Brazilian Data Annotations (`NuvTools.Validation.Brazil.Annotations`)
+### Brazilian Data Annotations (`NuvTools.Validation.Brazil.Annotations`)
 
 - `CPFAttribute` - CPF validation attribute
 - `CNPJAttribute` - CNPJ validation attribute
-
-### NuvTools.Validation.AspNetCore.Blazor Library
-
-Blazor integration for FluentValidation.
-
-**FluentValidation\<TModel\>** - Bridges FluentValidation with Blazor's EditContext:
-- Constructor parameters: model, validator, editContext, autoValidationOnRequested, autoValidationOnFieldChanged, highlightInvalidFields
-- `Validate()` - Validates entire model and populates ValidationMessageStore
-- `ValidateField()` - Validates a single field by FieldIdentifier
-- `ToFieldIdentifier()` (private) - Resolves nested property paths (e.g., "Address.City") by traversing the object graph
-
-Key design pattern: The `ToFieldIdentifier()` method handles property path resolution for nested objects, ensuring validation errors bind correctly to nested properties in Blazor forms.
 
 ## Localization
 
@@ -133,7 +118,3 @@ Tests use NUnit 4.x and target only `net10.0`. Patterns:
 
 ### NuvTools.Validation
 - No external package dependencies
-
-### NuvTools.Validation.AspNetCore.Blazor
-- FluentValidation [12.1.1,13.0.0)
-- Microsoft.AspNetCore.Components.Forms (version varies by target framework)

@@ -1,52 +1,50 @@
-# NuvTools Validation Libraries
+# NuvTools Validation Library
 
 [![NuGet](https://img.shields.io/nuget/v/NuvTools.Validation.svg)](https://www.nuget.org/packages/NuvTools.Validation/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A comprehensive validation library for .NET applications, providing robust validation features for Web, Desktop, and Mobile (MAUI) applications. Includes specialized validators for Brazilian documents, password complexity rules, and seamless integration with Blazor and FluentValidation. These libraries target modern .NET platforms, including .NET 8, .NET 9, and .NET 10.
-
-## Libraries
-
-### NuvTools.Validation
-
-Core validation library with Brazilian document validators, regex patterns, and data annotations.
-
-**Key Features:**
-- **Brazilian Document Validators**: CPF, CNPJ, mobile phone, and ZIP code (CEP) validation
-- **General Validators**: Email, numeric types (int, long, decimal), Base64/Data URI validation
-- **Data Annotations**: CPF/CNPJ attributes, password complexity attributes
-- **Formatting Utilities**: CPF and CNPJ formatting helpers
-
-### NuvTools.Validation.AspNetCore.Blazor
-
-Blazor integration for FluentValidation with EditContext and ValidationMessageStore support.
-
-**Key Features:**
-- **FluentValidation Integration**: Bridges FluentValidation with Blazor's EditContext
-- **Auto-Validation**: Automatic validation on form submission and field change
-- **Nested Properties**: Support for nested property path validation
-- **Field Highlighting**: Configurable invalid field highlighting via ValidationMessageStore
+A validation library for .NET applications, providing robust validation features for Web, Desktop, and Mobile (MAUI) applications. Includes email and numeric validators, specialized Brazilian document validators (CPF, CNPJ, phone, CEP), password complexity attributes, and data annotations. This library targets modern .NET platforms, including .NET 8, .NET 9, and .NET 10.
 
 ## Installation
 
 Install via NuGet Package Manager:
 
 ```bash
-# For core validation features
 dotnet add package NuvTools.Validation
-
-# For Blazor applications with FluentValidation
-dotnet add package NuvTools.Validation.AspNetCore.Blazor
 ```
 
 Or via Package Manager Console:
 
 ```powershell
 Install-Package NuvTools.Validation
-Install-Package NuvTools.Validation.AspNetCore.Blazor
 ```
 
+## Key Features
+
+- **General Validators**: Email, numeric types (int, long, decimal), Base64/Data URI validation
+- **Brazilian Document Validators**: CPF, CNPJ, mobile phone, and ZIP code (CEP) validation
+- **Document Formatting**: CPF and CNPJ formatting helpers
+- **Data Annotations**: CPF/CNPJ validation attributes, password complexity attributes
+- **Localized Messages**: Validation messages in English and Portuguese (pt-BR)
+
 ## Quick Start
+
+### General Validation
+
+```csharp
+using NuvTools.Validation;
+
+// Email validation
+bool isValid = "user@example.com".IsEmail();
+
+// Numeric validation
+bool isInt = "12345".IsIntNumber();
+bool isPositive = "12345".IsIntNumber(positiveOnly: true);
+bool isLong = "12345".IsLongNumber();
+
+// Decimal validation
+bool isDecimal = "123.45".IsDecimalNumber();
+```
 
 ### Brazilian Document Validation
 
@@ -54,24 +52,19 @@ Install-Package NuvTools.Validation.AspNetCore.Blazor
 using NuvTools.Validation.Brazil;
 
 // Validate CPF
-string cpf = "123.456.789-01";
-bool isValid = cpf.IsCPF();
+bool isValid = "123.456.789-01".IsCPF();
 
 // Validate CNPJ
-string cnpj = "12.345.678/0001-95";
-bool isValid = cnpj.IsCNPJ();
+bool isValid = "12.345.678/0001-95".IsCNPJ();
 
 // Auto-detect CPF or CNPJ
-string document = "12345678901";
-bool isValid = document.IsCPForCNPJ();
+bool isValid = "12345678901".IsCPForCNPJ();
 
 // Validate mobile phone
-string phone = "11987654321";
-bool isValid = phone.IsMobileNumber();
+bool isValid = "11987654321".IsMobileNumber();
 
 // Validate ZIP code (CEP)
-string zipCode = "01310-100";
-bool isValid = zipCode.IsZipCodeNumber();
+bool isValid = "01310-100".IsZipCodeNumber();
 ```
 
 ### Document Formatting
@@ -80,32 +73,12 @@ bool isValid = zipCode.IsZipCodeNumber();
 using NuvTools.Validation.Brazil;
 
 // Format CPF
-string cpf = "12345678901";
-string formatted = cpf.FormatCPF(); // Returns "123.456.789-01"
+string formatted = "12345678901".FormatCPF();
+// Output: 123.456.789-01
 
 // Format CNPJ
-string cnpj = "12345678000195";
-string formatted = cnpj.FormatCNPJ(); // Returns "12.345.678/0001-95"
-```
-
-### General Validation
-
-```csharp
-using NuvTools.Validation;
-
-// Email validation
-string email = "user@example.com";
-bool isValid = email.IsEmail();
-
-// Numeric validation
-string number = "12345";
-bool isInt = number.IsIntNumber();
-bool isPositive = number.IsIntNumber(positiveOnly: true);
-bool isLong = number.IsLongNumber();
-
-// Decimal validation
-string value = "123.45";
-bool isDecimal = value.IsDecimalNumber();
+string formatted = "12345678000195".FormatCNPJ();
+// Output: 12.345.678/0001-95
 ```
 
 ### Data Annotations
@@ -144,79 +117,10 @@ var model = new UserRegistrationModel
 var errors = model.Validate(); // Returns null if valid, or list of error messages
 ```
 
-### Blazor FluentValidation Integration
-
-```razor
-@page "/register"
-@using NuvTools.Validation.AspNetCore.Blazor
-@using FluentValidation
-
-<EditForm Model="@model" OnValidSubmit="HandleSubmit">
-    <NuvTools.Validation.AspNetCore.Blazor.FluentValidation TModel="UserModel"
-        @ref="fluentValidation"
-        Validator="validator"
-        Model="model"
-        EditContext="editContext" />
-
-    <InputText @bind-Value="model.Name" />
-    <ValidationMessage For="() => model.Name" />
-
-    <InputText @bind-Value="model.Address.City" />
-    <ValidationMessage For="() => model.Address.City" />
-
-    <button type="submit">Submit</button>
-</EditForm>
-
-@code {
-    private UserModel model = new();
-    private EditContext editContext;
-    private UserModelValidator validator = new();
-    private FluentValidation<UserModel> fluentValidation;
-
-    protected override void OnInitialized()
-    {
-        editContext = new EditContext(model);
-        fluentValidation = new FluentValidation<UserModel>(
-            model,
-            validator,
-            editContext,
-            autoValidationOnRequested: true,
-            autoValidationOnFieldChanged: true
-        );
-    }
-
-    public class UserModel
-    {
-        public string Name { get; set; }
-        public Address Address { get; set; } = new();
-    }
-
-    public class Address
-    {
-        public string City { get; set; }
-    }
-
-    public class UserModelValidator : AbstractValidator<UserModel>
-    {
-        public UserModelValidator()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Address.City).NotEmpty();
-        }
-    }
-
-    private void HandleSubmit()
-    {
-        // Form is valid
-    }
-}
-```
-
 ## Features
 
 - **Multi-targeting**: Compatible with .NET 8, .NET 9, and .NET 10
 - **Comprehensive documentation**: Full XML documentation for IntelliSense
-- **Modular design**: Use only what you need
 - **Modern C# features**: Uses nullable reference types, implicit usings, and source-generated regex
 
 ## Building from Source
@@ -242,7 +146,6 @@ dotnet build NuvTools.Validation.slnx --configuration Release
 
 - .NET 8.0 SDK or higher
 - Visual Studio 2022 (v17.11+) or Visual Studio Code with C# extension
-- FluentValidation 12.x (for NuvTools.Validation.AspNetCore.Blazor)
 
 ## Contributing
 
@@ -256,5 +159,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [GitHub Repository](https://github.com/nuvtools/nuvtools-validation)
 - [NuGet Package - NuvTools.Validation](https://www.nuget.org/packages/NuvTools.Validation/)
-- [NuGet Package - NuvTools.Validation.AspNetCore.Blazor](https://www.nuget.org/packages/NuvTools.Validation.AspNetCore.Blazor/)
 - [Official Website](https://nuvtools.com)
