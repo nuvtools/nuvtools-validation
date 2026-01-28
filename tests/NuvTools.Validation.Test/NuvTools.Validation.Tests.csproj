@@ -4,20 +4,22 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<Authors>Nuv Tools</Authors>
-		<Copyright>Copyright © 2025 Nuv Tools</Copyright>
+		<Copyright>Copyright © 2026 Nuv Tools</Copyright>
 		<PackageProjectUrl>https://nuvtools.com</PackageProjectUrl>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="FluentValidation" Version="[12.1.1,13.0.0)" />
 		<PackageReference Include="NUnit" Version="4.4.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\NuvTools.Validation.AspNetCore.Blazor\NuvTools.Validation.AspNetCore.Blazor.csproj" />
-	  <ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
+		<ProjectReference Include="..\..\src\NuvTools.Validation.AspNetCore.Blazor\NuvTools.Validation.AspNetCore.Blazor.csproj" />
+		<ProjectReference Include="..\..\src\NuvTools.Validation\NuvTools.Validation.csproj" />
 	</ItemGroup>
 
 </Project>

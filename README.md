@@ -1,66 +1,52 @@
-# NuvTools Validation Library
+# NuvTools Validation Libraries
 
 [![NuGet](https://img.shields.io/nuget/v/NuvTools.Validation.svg)](https://www.nuget.org/packages/NuvTools.Validation/)
-[![License](https://img.shields.io/github/license/nuvtools/nuvtools-validation)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-NuvTools Validation is a comprehensive validation library for .NET 8, 9, and 10, designed to provide robust validation features for Web, Desktop, and Mobile (MAUI) applications. It includes specialized validators for Brazilian documents, password complexity rules, and seamless integration with Blazor and FluentValidation.
+A comprehensive validation library for .NET applications, providing robust validation features for Web, Desktop, and Mobile (MAUI) applications. Includes specialized validators for Brazilian documents, password complexity rules, and seamless integration with Blazor and FluentValidation. These libraries target modern .NET platforms, including .NET 8, .NET 9, and .NET 10.
 
-## 📦 Packages
+## Libraries
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| **NuvTools.Validation** | [![NuGet](https://img.shields.io/nuget/v/NuvTools.Validation.svg)](https://www.nuget.org/packages/NuvTools.Validation/) | Core validation library with Brazilian validators, regex patterns, and data annotations |
-| **NuvTools.Validation.AspNetCore.Blazor** | [![NuGet](https://img.shields.io/nuget/v/NuvTools.Validation.AspNetCore.Blazor.svg)](https://www.nuget.org/packages/NuvTools.Validation.AspNetCore.Blazor/) | Blazor integration with FluentValidation support |
+### NuvTools.Validation
 
-## 🚀 Installation
+Core validation library with Brazilian document validators, regex patterns, and data annotations.
+
+**Key Features:**
+- **Brazilian Document Validators**: CPF, CNPJ, mobile phone, and ZIP code (CEP) validation
+- **General Validators**: Email, numeric types (int, long, decimal), Base64/Data URI validation
+- **Data Annotations**: CPF/CNPJ attributes, password complexity attributes
+- **Formatting Utilities**: CPF and CNPJ formatting helpers
+
+### NuvTools.Validation.AspNetCore.Blazor
+
+Blazor integration for FluentValidation with EditContext and ValidationMessageStore support.
+
+**Key Features:**
+- **FluentValidation Integration**: Bridges FluentValidation with Blazor's EditContext
+- **Auto-Validation**: Automatic validation on form submission and field change
+- **Nested Properties**: Support for nested property path validation
+- **Field Highlighting**: Configurable invalid field highlighting via ValidationMessageStore
+
+## Installation
 
 Install via NuGet Package Manager:
 
 ```bash
+# For core validation features
 dotnet add package NuvTools.Validation
-```
 
-For Blazor applications with FluentValidation:
-
-```bash
+# For Blazor applications with FluentValidation
 dotnet add package NuvTools.Validation.AspNetCore.Blazor
 ```
 
-## ✨ Features
+Or via Package Manager Console:
 
-### Core Validation (NuvTools.Validation)
+```powershell
+Install-Package NuvTools.Validation
+Install-Package NuvTools.Validation.AspNetCore.Blazor
+```
 
-- **Brazilian Document Validators**
-  - CPF (Cadastro de Pessoas Físicas) validation
-  - CNPJ (Cadastro Nacional da Pessoa Jurídica) validation
-  - Brazilian mobile phone number validation
-  - ZIP code (CEP) validation
-  - Auto-detection of CPF or CNPJ
-
-- **General Validators**
-  - Email address validation
-  - Numeric validation (int, long, decimal)
-  - Base64 content and Data URI validation
-
-- **Data Annotations**
-  - CPF/CNPJ validation attributes
-  - Password complexity attributes (capital letters, lowercase, digits)
-  - Custom validation attributes
-
-- **Formatting Utilities**
-  - CPF formatting (XXX.XXX.XXX-XX)
-  - CNPJ formatting (XX.XXX.XXX/XXXX-XX)
-
-### Blazor Integration (NuvTools.Validation.AspNetCore.Blazor)
-
-- FluentValidation integration with EditContext
-- MudBlazor MudForm integration via PropertyValidatorBase
-- Automatic validation on form submission
-- Field-level validation on change
-- Support for nested property validation
-- ValidationMessageStore integration
-
-## 📖 Usage Examples
+## Quick Start
 
 ### Brazilian Document Validation
 
@@ -69,23 +55,23 @@ using NuvTools.Validation.Brazil;
 
 // Validate CPF
 string cpf = "123.456.789-01";
-bool isValid = cpf.IsCPF(); // Returns true or false
+bool isValid = cpf.IsCPF();
 
 // Validate CNPJ
 string cnpj = "12.345.678/0001-95";
-bool isValid = cnpj.IsCNPJ(); // Returns true or false
+bool isValid = cnpj.IsCNPJ();
 
 // Auto-detect CPF or CNPJ
 string document = "12345678901";
-bool isValid = document.IsCPForCNPJ(); // Validates based on length
+bool isValid = document.IsCPForCNPJ();
 
 // Validate mobile phone
 string phone = "11987654321";
-bool isValid = phone.IsMobileNumber(); // Validates Brazilian mobile format
+bool isValid = phone.IsMobileNumber();
 
 // Validate ZIP code (CEP)
 string zipCode = "01310-100";
-bool isValid = zipCode.IsZipCodeNumber(); // Validates format
+bool isValid = zipCode.IsZipCodeNumber();
 ```
 
 ### Document Formatting
@@ -118,8 +104,8 @@ bool isPositive = number.IsIntNumber(positiveOnly: true);
 bool isLong = number.IsLongNumber();
 
 // Decimal validation
-string decimal = "123.45";
-bool isDecimal = decimal.IsDecimalNumber();
+string value = "123.45";
+bool isDecimal = value.IsDecimalNumber();
 ```
 
 ### Data Annotations
@@ -160,7 +146,7 @@ var errors = model.Validate(); // Returns null if valid, or list of error messag
 
 ### Blazor FluentValidation Integration
 
-```csharp
+```razor
 @page "/register"
 @using NuvTools.Validation.AspNetCore.Blazor
 @using FluentValidation
@@ -226,89 +212,16 @@ var errors = model.Validate(); // Returns null if valid, or list of error messag
 }
 ```
 
-### MudBlazor Integration with PropertyValidatorBase
+## Features
 
-The `PropertyValidatorBase` class is specifically designed for use with [MudBlazor](https://mudblazor.com/) forms. MudForm components automatically call the `ValidatePropertyAsync` delegate for field-level validation.
+- **Multi-targeting**: Compatible with .NET 8, .NET 9, and .NET 10
+- **Comprehensive documentation**: Full XML documentation for IntelliSense
+- **Modular design**: Use only what you need
+- **Modern C# features**: Uses nullable reference types, implicit usings, and source-generated regex
 
-```csharp
-@page "/register"
-@using MudBlazor
-@using NuvTools.Validation.AspNetCore.Blazor.FluentValidation
-@using FluentValidation
+## Building from Source
 
-<MudForm Model="@model" @ref="form" Validation="@(validator.ValidatePropertyAsync)">
-    <MudTextField @bind-Value="model.Email"
-                  For="@(() => model.Email)"
-                  Label="Email"
-                  Required="true" />
-
-    <MudTextField @bind-Value="model.Name"
-                  For="@(() => model.Name)"
-                  Label="Name"
-                  Required="true" />
-
-    <MudTextField @bind-Value="model.Password"
-                  For="@(() => model.Password)"
-                  Label="Password"
-                  InputType="InputType.Password"
-                  Required="true" />
-
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               OnClick="@(async () => await Submit())">
-        Register
-    </MudButton>
-</MudForm>
-
-@code {
-    private MudForm form;
-    private UserModel model = new();
-    private UserModelValidator validator = new();
-
-    public class UserModel
-    {
-        public string Email { get; set; }
-        public string Name { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class UserModelValidator : PropertyValidatorBase<UserModel>
-    {
-        public UserModelValidator()
-        {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required")
-                .EmailAddress().WithMessage("Invalid email format");
-
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required")
-                .MinimumLength(3).WithMessage("Name must be at least 3 characters");
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required")
-                .MinimumLength(8).WithMessage("Password must be at least 8 characters");
-        }
-    }
-
-    private async Task Submit()
-    {
-        await form.Validate();
-
-        if (form.IsValid)
-        {
-            // Process the valid form
-        }
-    }
-}
-```
-
-## 🎯 Supported Frameworks
-
-- .NET 8
-- .NET 9
-- .NET 10
-
-## 🔧 Building from Source
+This project uses the modern `.slnx` solution format (Visual Studio 2022 v17.11+).
 
 ```bash
 # Clone the repository
@@ -316,34 +229,32 @@ git clone https://github.com/nuvtools/nuvtools-validation.git
 cd nuvtools-validation
 
 # Build the solution
-dotnet build NuvTools.Validation.slnx -c Release
+dotnet build NuvTools.Validation.slnx
 
 # Run tests
-dotnet test NuvTools.Validation.slnx -c Release
+dotnet test NuvTools.Validation.slnx
 
-# Create NuGet packages
-dotnet pack NuvTools.Validation.slnx -c Release
+# Create release packages
+dotnet build NuvTools.Validation.slnx --configuration Release
 ```
 
-## 📝 License
+## Requirements
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- .NET 8.0 SDK or higher
+- Visual Studio 2022 (v17.11+) or Visual Studio Code with C# extension
+- FluentValidation 12.x (for NuvTools.Validation.AspNetCore.Blazor)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 🔗 Links
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Links
 
 - [GitHub Repository](https://github.com/nuvtools/nuvtools-validation)
 - [NuGet Package - NuvTools.Validation](https://www.nuget.org/packages/NuvTools.Validation/)
 - [NuGet Package - NuvTools.Validation.AspNetCore.Blazor](https://www.nuget.org/packages/NuvTools.Validation.AspNetCore.Blazor/)
-- [Website](https://nuvtools.com)
-
-## 💡 Support
-
-If you encounter any issues or have questions, please [open an issue](https://github.com/nuvtools/nuvtools-validation/issues) on GitHub.
-
----
-
-Copyright © 2025 Nuv Tools
+- [Official Website](https://nuvtools.com)
