@@ -22,7 +22,7 @@ Install-Package NuvTools.Validation
 ## Key Features
 
 - **General Validators**: Email, numeric types (int, long, decimal), Base64/Data URI validation
-- **Brazilian Document Validators**: CPF, CNPJ, mobile phone, and ZIP code (CEP) validation
+- **Brazilian Document Validators**: CPF, CNPJ (including the new RFB alphanumeric format), mobile phone, and ZIP code (CEP) validation
 - **Document Formatting**: CPF and CNPJ formatting helpers
 - **Data Annotations**: CPF/CNPJ validation attributes, password complexity attributes
 - **Localized Messages**: Validation messages in English and Portuguese (pt-BR)
@@ -54,8 +54,11 @@ using NuvTools.Validation.Brazil;
 // Validate CPF
 bool isValid = "123.456.789-01".IsCPF();
 
-// Validate CNPJ
+// Validate CNPJ (numeric)
 bool isValid = "12.345.678/0001-95".IsCNPJ();
+
+// Validate CNPJ (new RFB alphanumeric format — uppercase A–Z and 0–9 in positions 1–12)
+bool isValidAlpha = "12.ABC.345/01DE-35".IsCNPJ();
 
 // Auto-detect CPF or CNPJ
 bool isValid = "12345678901".IsCPForCNPJ();

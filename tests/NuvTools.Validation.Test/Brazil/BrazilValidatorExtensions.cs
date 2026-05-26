@@ -9,6 +9,7 @@ public class BrazilValidatorExtensions
     [Test()]
     public void ValidateCNPJ()
     {
+        // Legacy numeric CNPJs
         Assert.That(!"11111111111111".IsCNPJ());
         Assert.That(!"00000000000000".IsCNPJ());
         Assert.That("03.785.417/0001-03".IsCNPJ());
@@ -20,6 +21,16 @@ public class BrazilValidatorExtensions
         Assert.That(!"03.785.417/0001-00".IsCNPJ()); // Valid format, invalid digits
         Assert.That(!"03.785.417/0001-031".IsCNPJ()); // Too long
         Assert.That(!"03.785.417/0001".IsCNPJ()); // Too short
+
+        // New RFB alphanumeric format
+        Assert.That("12.ABC.345/01DE-35".IsCNPJ()); // Valid alphanumeric (formatted)
+        Assert.That("12ABC34501DE35".IsCNPJ()); // Valid alphanumeric (unformatted)
+        Assert.That("12abc34501de35".IsCNPJ()); // Lowercase normalized to uppercase
+
+        Assert.That(!"AAAAAAAAAAAA00".IsCNPJ()); // All-same letters in body — algorithmic invalid
+        Assert.That(!"12.ABC.345/01DE-99".IsCNPJ()); // Valid format/charset, wrong check digits
+        Assert.That(!"12ABC34501DEAB".IsCNPJ()); // Letters in check-digit positions
+        Assert.That(!"12@BC34501DE35".IsCNPJ()); // Disallowed character in body
     }
 
     [Test()]

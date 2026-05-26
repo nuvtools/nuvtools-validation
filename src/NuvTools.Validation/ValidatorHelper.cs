@@ -15,4 +15,12 @@ internal static partial class ValidatorHelper
 
     [GeneratedRegex(@"\D", RegexOptions.IgnoreCase)]
     private static partial Regex GetNumbersOnlyRegex();
+
+    public static string GetAlphanumericOnly(this string value)
+    {
+        return GetAlphanumericOnlyRegex().Replace(value, string.Empty).ToUpperInvariant();
+    }
+
+    [GeneratedRegex(@"[^0-9A-Za-z]")]
+    private static partial Regex GetAlphanumericOnlyRegex();
 }

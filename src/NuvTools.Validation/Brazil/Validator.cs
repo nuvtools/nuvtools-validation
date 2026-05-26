@@ -26,8 +26,11 @@ public static class Validator
 
         if (numbersOnly.Length == 11)
             return IsCPF(numbersOnly);
-        if (numbersOnly.Length == 14)
-            return IsCNPJ(numbersOnly);
+
+        string alphanumericOnly = value.GetAlphanumericOnly();
+        if (alphanumericOnly.Length == 14)
+            return IsCNPJ(alphanumericOnly);
+
         return false;
     }
 
@@ -89,6 +92,8 @@ public static class Validator
     /// <summary>
     /// Validates a Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) number using the official checksum algorithm.
     /// Accepts both formatted (XX.XXX.XXX/XXXX-XX) and unformatted (XXXXXXXXXXXXXX) input.
+    /// Supports the new RFB alphanumeric format (uppercase A–Z and 0–9 in positions 1–12, numeric check digits in 13–14)
+    /// while remaining backward compatible with the legacy numeric-only format.
     /// </summary>
     /// <param name="value">The CNPJ value to validate.</param>
     /// <returns>True if the CNPJ is valid according to the checksum algorithm; otherwise, false.</returns>
@@ -96,43 +101,48 @@ public static class Validator
     /// <code>
     /// bool isValid = "12.345.678/0001-95".IsCNPJ();
     /// bool isValidUnformatted = "12345678000195".IsCNPJ();
+    /// bool isValidAlphanumeric = "12.ABC.345/01DE-35".IsCNPJ();
     /// </code>
     /// </example>
     public static bool IsCNPJ(this string value)
     {
-        value = value.GetNumbersOnly();
+        value = value.GetAlphanumericOnly();
 
         if (value.Length != 14)
+            return false;
+
+        for (int i = 0; i < 12; i++)
+        {
+            char c = value[i];
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z')))
+                return false;
+        }
+
+        if (!char.IsDigit(value[12]) || !char.IsDigit(value[13]))
             return false;
 
         if (value.Distinct().Count() == 1)
             return false;
 
-        int[] multiplier1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-        int[] multiplier2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplier1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplier2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        string tempValue = value[..12];
         int sum = 0;
-
         for (int i = 0; i < 12; i++)
-            sum += (tempValue[i] - '0') * multiplier1[i];
+            sum += (value[i] - '0') * multiplier1[i];
 
         int remainder = sum % 11;
-        remainder = remainder < 2 ? 0 : 11 - remainder;
-
-        string digit = remainder.ToString();
-        tempValue += digit;
+        int digit1 = remainder < 2 ? 0 : 11 - remainder;
 
         sum = 0;
-        for (int i = 0; i < 13; i++)
-            sum += (tempValue[i] - '0') * multiplier2[i];
+        for (int i = 0; i < 12; i++)
+            sum += (value[i] - '0') * multiplier2[i];
+        sum += digit1 * multiplier2[12];
 
         remainder = sum % 11;
-        remainder = remainder < 2 ? 0 : 11 - remainder;
+        int digit2 = remainder < 2 ? 0 : 11 - remainder;
 
-        digit += remainder.ToString();
-
-        return value.EndsWith(digit);
+        return value[12] - '0' == digit1 && value[13] - '0' == digit2;
     }
 
     /// <summary>
