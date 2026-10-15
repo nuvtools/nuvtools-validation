@@ -1,0 +1,229 @@
+# =============================================================================
+# Publishes ONE package of this repository to nuget.org. Reusable: it is never
+# triggered by itself — each library has a small workflow of its own
+# (validation-publish.yml) that names the project, the package and the tag
+# prefix, and calls this one.
+#
+# Gated on the "nuget" GitHub Environment, whose required reviewers approve the
+# push.
+#
+# Publishing to nuget.org is IRREVERSIBLE per version: a version can be
+# unlisted but never replaced or re-pushed. Everything below exists to make the
+# irreversible step the last one and the smallest one.
+# =============================================================================
+
+name: Package Publish (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: "Path to the package's .csproj"
+        type: string
+        required: true
+      package-id:
+        description: "The package's id on nuget.org"
+        type: string
+        required: true
+      tag-prefix:
+        description: "What the release tag written after a push starts with, e.g. validation-v"
+        type: string
+        required: true
+      target-frameworks:
+        description: "Space-separated frameworks the package must carry"
+        type: string
+        default: "net8.0 net9.0 net10.0"
+      push:
+        description: "Push to nuget.org after building and verifying"
+        type: boolean
+        default: false
+    secrets:
+      # The nuget.org profile name (not the e-mail) the trusted publishing policy belongs to.
+      NUGET_USER:
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ inputs.project }}
+  PACKAGE_ID: ${{ inputs.package-id }}
+  TAG_PREFIX: ${{ inputs.tag-prefix }}
+  SOLUTION: NuvTools.Validation.slnx
+
+jobs:
+  pack:
+    name: Build & verify
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        # Full history: SourceLink embeds the commit, and a shallow clone makes
+        # the link point at something a consumer's debugger cannot resolve.
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      # ---------------------------------------------------------------------
+      # The version is VERIFIED, never computed. The .csproj is the single
+      # statement of what version this is; a workflow that derived it from the
+      # tag would let a tag publish a package whose assembly says something
+      # else, and the mismatch would only surface in a consumer's stack trace.
+      # ---------------------------------------------------------------------
+      - name: Read version from the project
+        id: version
+        run: |
+          version="$(grep -oPm1 '(?<=<Version>)[^<]+' "$PROJECT")"
+          if [ -z "$version" ]; then
+            echo "::error file=$PROJECT::No <Version> found."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Project version: $version"
+
+      # The release tag is written by this workflow after a successful push, so a tag that already
+      # exists means this version has been released. Stopping here, before anything is built, is
+      # what turns "forgot to bump <Version>" into a clear message instead of a silent skip.
+      #
+      # Versions of this repository were published by hand before this workflow existed, so they
+      # are on nuget.org with no tag. Pushing one of them would skip the duplicate and then tag
+      # this commit as a release it is not. That is refused too — except on a re-run of the same
+      # run, which is how a push that succeeded and a tag that failed is finished.
+      - name: Check this version has not been released
+        if: ${{ inputs.push }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          tag="${TAG_PREFIX}${version}"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "::error file=$PROJECT::$tag already exists: version $version has been released. Bump <Version> in $PROJECT."
+            exit 1
+          fi
+          echo "$tag does not exist yet."
+
+          lower="$(echo "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')"
+          if curl -fsS -o /dev/null "https://api.nuget.org/v3-flatcontainer/$lower/$version/$lower.nuspec"; then
+            if [ "${{ github.run_attempt }}" = "1" ]; then
+              echo "::error file=$PROJECT::$PACKAGE_ID $version is already on nuget.org, published outside this workflow. Bump <Version> in $PROJECT."
+              exit 1
+            fi
+            echo "$PACKAGE_ID $version is already on nuget.org; this re-run only writes the tag."
+          else
+            echo "$PACKAGE_ID $version is not on nuget.org yet."
+          fi
+
+      # The whole solution, not only this package: a release goes out from a
+      # commit where everything in the repository builds and passes.
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore -c Release -warnaserror
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION }} --no-build -c Release --verbosity normal
+
+      # Every project here sets GeneratePackageOnBuild, so the build above has already packed all
+      # of them. Only this package is copied out, so only this package can be pushed.
+      - name: Collect the package
+        run: |
+          package="$(dirname "$PROJECT")/bin/Release/$PACKAGE_ID.${{ steps.version.outputs.version }}"
+          mkdir -p artifacts
+          for extension in nupkg snupkg; do
+            [ -f "$package.$extension" ] || { echo "::error file=$PROJECT::$package.$extension was not produced by the build."; exit 1; }
+            cp "$package.$extension" artifacts/
+          done
+
+      # A package that is missing its README, licence or symbols is only
+      # discovered after it is published, when it can no longer be fixed.
+      - name: Verify the package carries what it should
+        run: |
+          set -e
+          nupkg="artifacts/$PACKAGE_ID.${{ steps.version.outputs.version }}.nupkg"
+          for entry in README.md LICENSE icon.png; do
+            unzip -l "$nupkg" | grep -q "$entry" || { echo "::error::$entry is missing from the package."; exit 1; }
+          done
+          for tfm in ${{ inputs.target-frameworks }}; do
+            unzip -l "$nupkg" | grep -q "lib/$tfm/$PACKAGE_ID.dll" \
+              || { echo "::error::$tfm is missing from the package."; exit 1; }
+          done
+          echo "Package contents verified."
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: package
+          path: artifacts/*
+
+  publish:
+    name: Push to nuget.org
+    needs: pack
+    if: ${{ inputs.push }}
+    runs-on: ubuntu-latest
+    # Trusted publishing: no API key is stored anywhere. This job asks GitHub for an OIDC token,
+    # nuget.org checks it against the policy registered for this repository, workflow file and
+    # environment, and answers with a key that lives for one hour. id-token is what lets the job
+    # ask; the calling workflow has to grant it too, since a called workflow cannot widen it.
+    # contents: write is for the release tag this job creates once the push has succeeded.
+    permissions:
+      contents: write
+      id-token: write
+    environment:
+      name: nuget
+      url: https://www.nuget.org/packages/${{ inputs.package-id }}/${{ needs.pack.outputs.version }}
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v8
+        with:
+          name: package
+          path: artifacts
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      # Requested immediately before the push: the key is single-use per token and expires in an hour.
+      - name: NuGet login (OIDC, temporary API key)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      # --skip-duplicate so a re-run of a partially failed publish is not itself
+      # a failure: nuget.org rejects a version that already exists, and that is
+      # the correct outcome rather than an error to investigate. It never
+      # replaces what is there — a version that is already published stays
+      # exactly as it was.
+      - name: Push
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
+            --skip-duplicate
+
+      # After the push and only after it: the tag records what is on nuget.org, so it must never
+      # exist for a version that did not get there. Created through the API on the commit this run
+      # built, which needs no checkout. If a previous attempt pushed the package and failed here,
+      # re-running skips the duplicate push and writes the tag.
+      - name: Tag the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${TAG_PREFIX}${{ needs.pack.outputs.version }}"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "$tag already exists; leaving it as it is."
+          else
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA" >/dev/null
+            echo "Created $tag at $GITHUB_SHA."
+          fi

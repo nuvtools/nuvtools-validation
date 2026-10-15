@@ -1,0 +1,47 @@
+# =============================================================================
+# Continuous integration: builds and tests the solution on every push and pull
+# request. Publishing lives in package-publish.yml.
+# =============================================================================
+
+name: CI
+run-name: CI · ${{ github.head_ref || github.ref_name }}
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SOLUTION: NuvTools.Validation.slnx
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Every target framework a package is built for, so a break on net8.0 is found here rather
+      # than by somebody installing it.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore -c Release -warnaserror
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION }} --no-build -c Release --verbosity normal
