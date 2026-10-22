@@ -6,13 +6,6 @@ namespace NuvTools.Validation;
 public static partial class Validator
 {
     /// <summary>
-    /// Validate the e-mail address.
-    /// </summary>
-    /// <param name="value">E-mail address</param>
-    /// <returns></returns>
-    public static bool IsEmail(this string value) => RegexPattern.EmailRegex().IsMatch(value);
-
-    /// <summary>
     /// Checks if the provided string contains only numeric characters.
     /// </summary>
     /// <param name="input">The string to check.</param>
